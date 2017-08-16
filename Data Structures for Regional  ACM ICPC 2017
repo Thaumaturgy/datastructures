@@ -1,0 +1,151 @@
+//Sieve of Eratosthenes (using Primality Test)
+
+boolean[] arr = new boolean[n + 1];
+// Use the indexes to indicate primality of a number; 1 -> index 1
+// and so on
+// To store numbers up to n, we initialize size to n+1
+// This way, we'll be able to use n as an index
+
+for (int i = 2; i <= Math.sqrt(n); i++) { // Checking for composites
+for (int j = 2; i * j <= n; j++) { // All numbers i*j are composite
+arr[i * j] = true; // true that it is composite;
+}
+}
+
+//Disjoint Sets
+class UFDS{
+	HashMap<String, Node> names = new HashMap<>();
+	
+	public Node find(Node n){ //find Parent or Root
+		if(n.parent == n) return n;
+		return find(n.parent);
+	}
+	
+	public void addNode(String s){
+		if(names.get(s) == null)
+			names.put(s, new Node(s));
+	}
+	
+	public boolean union(String a, String b){ //subdue one parent
+		Node aRoot = find(names.get(a));
+		Node bRoot = find(names.get(b));
+		if(aRoot != bRoot){
+			aRoot.connection = aRoot.connection + bRoot.connection; //updates # of connections
+			bRoot.parent = aRoot; //bRoot becomes parent of aRoot tree
+			System.out.println(aRoot.connection);
+			return true;
+		}
+		System.out.println(aRoot.connection);
+		return false;
+	}
+}
+
+class Node{
+	int connection = 1; //number of 'friends'
+	Node parent = this;
+	String data;
+	Node(String s){
+		data = s;
+	}
+}
+
+
+
+
+//Recursive Binary Search
+public int bsearch(int[] arr, int left, int right, int findMe){
+		if(left > right)
+			return -1; //failure
+		
+		int mid = (left+right)/2; //get midpoint of array or subarray
+		
+		if(findMe == arr[mid]) //return index if match found
+			return mid;
+		else if(findMe > arr[mid]) //findMe is in right side!
+			return bsearch(arr, mid+1, right, findMe);
+		else				//findMe must be in left side!
+			return bsearch(arr, left, mid-1, findMe);
+}
+
+//Dijkstra’s Algorithm (with Comparator<>())
+public void dijkstra(int s, int e){
+	Node temp = map.get(s);
+	Node end = map.get(e);
+	PriorityQueue<Node> pq = new PriorityQueue<>(new Comparator<Node>(){
+		public int compare(Node a, Node b) { //Anonymous Class; defines how Comparator works
+			if(a.cost < b.cost) return -1;
+			else if(a.cost> b.cost) return 1;
+			return 0;
+		}
+	});
+	pq.add(temp);
+	temp.cost = 0;
+	while(!pq.isEmpty()){
+		temp = pq.poll();
+		temp.visited = true; //can set it to visited because 
+		//we're sure all the other paths leading to it will just be more expensive
+		//We are sure because other paths leading to it LATER will not be cheaper
+		//because all edge weights are positive
+		for(int i = 0; i < temp.edges.size(); i++){
+			if(!temp.edges.get(i).neighbor.visited){
+				
+				if(temp.cost + temp.edges.get(i).weight < temp.edges.get(i).neighbor.cost){ //if running cost + travel cost < neighbor cost (neighbor cost is 0 initially but might be an updated value that can be shrunk)
+					temp.edges.get(i).neighbor.cost = temp.cost + temp.edges.get(i).weight;
+					pq.add(temp.edges.get(i).neighbor);
+				}
+			}
+		}
+	}
+	System.out.println("Lowest cost is: "+ end.cost);
+	resetFlagsAndWeights();
+}
+
+
+
+
+//Bellman-Ford Algorithm
+public void bellmanFord(Node start, Node end){
+	start.cost = 0; //set starting node cost to 0
+	for(int i = 0; i < verts.size()-1; i++){ //Bellman proved we have to iterate V-1 times
+		for(int j = 0; j < verts.size(); j++){ //Iterate through AdjList by visiting each node vert(j)
+			Node current = verts.get(j);
+			for(int k = 0; k < verts.get(j).edges.size(); k++){ 
+				//Iterate through all neighbors of vert(j) using this loop
+				Edge edge = verts.get(j).edges.get(k); //Just a wrapper to shorten code, not important
+				if(verts.get(j).cost != Integer.MAX_VALUE) //Bellman Relax
+					edge.neighbor.cost = Math.min(edge.neighbor.cost, edge.weight + current.cost);
+				//Set neighbor cost to minimum between (neighbor cost) 
+				//and (weight or cost of travel PLUS cost of current)
+
+			}
+		}
+	}
+	//Iterate through AdjList one more time
+	boolean hasNegativeCycle = false;
+	for(int j = 0; j < verts.size(); j++){
+		for(int k = 0; k < verts.get(j).edges.size(); k++){
+			//a current node + weight to travel to a neighbor still decreases
+			// and becomes cheaper than neighbor cost, then negative cycle exists
+			if(verts.get(j).cost + verts.get(j).edges.get(k).weight < verts.get(j).edges.get(k).neighbor.cost)
+				hasNegativeCycle = true;
+		}
+	}
+	System.out.println("Cost from " +start.data +" to "+end.data +" is: "+end.cost);
+	System.out.println("Has negative cycle: " + hasNegativeCycle);
+}
+
+//Comparator using Anonymous Classes
+public static Comparator<Fruit> FruitNameComparator = new Comparator<Fruit>() {
+			public int compare(Fruit fruit1, Fruit fruit2) {
+			String fruitName1 = fruit1.getFruitName().toUpperCase();
+			String fruitName2 = fruit2.getFruitName().toUpperCase();
+
+			//ascending order
+			return fruitName1.compareTo(fruitName2);
+
+			//descending order
+			//return fruitName2.compareTo(fruitName1);
+			}
+
+		};
+	}
