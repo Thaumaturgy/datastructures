@@ -1,0 +1,131 @@
+11111
+11001
+100e1
+10m11
+11111
+
+1111111001100e110m1111111
+------------------------------------
+100
+00e
+0m1
+
+10000e0m1
+------------------------------------
+start: 3 2
+end: 2 3
+------------------------------------
+rows:7 columns: 8
+01101000
+0110e101
+01101100
+01101100
+01101111
+000m1101
+00001010
+5 3
+1 4
+----------------------------
+rows:7 columns: 8
+01101000
+01101e01
+01101100
+01101100
+01101111
+000m1101
+00001010
+5 3
+1 5
+------------------------------------
+Rows: 13 columns: 48
+m1110011011000010110010001100001011100110110001e
+011100110000000101100100011100110110000001100111
+011000010111001101100000011100101100001101100100
+011101110110000100000110011000010111001101100110
+011101010111011100000101000001000111001101100001
+011101100111001101100110011011010100010001010101
+011011100000000101110011011101100111001101100001
+011011100111001101100001011101000110100001000101 
+011000000110100001101111011101110110100000000001
+011101000010000001101001011100110000000001101000
+000001110111011100100000011010000110000101101000
+011000010110100001100001011010000010000001110111
+011110010110111101101111011000010111001101100100
+
+0 0
+0 47
+
+//CODE
+/**
+ * @(#)MazeExit.java
+ *
+ *
+ * @author 
+ * @version 1.00 2016/9/2
+ */
+import java.util.Stack;
+import java.util.Scanner;
+public class MazeExit {
+
+    public static void main(String[] args){
+    	Scanner in = new Scanner(System.in);
+    	System.out.println("Please input N by N maze string: ");
+    	String maze = in.nextLine();
+    	char[] temp = maze.toCharArray();
+    	int size = (int)Math.sqrt(temp.length);
+    	System.out.println("size is: "+size);
+    	char[][] coords = new char[size][size];
+    	
+    	//move elements to 2D array
+    	int counter = 0;
+    	for(int i = 0; i < size; i++){
+    		for(int j = 0; j < size; j++)
+    			coords[i][j] = temp[counter++];
+    	}
+    	
+    	
+    	System.out.println("Please input starting point: x y");
+    	Cell start = new Cell(in.nextInt(), in.nextInt());
+    	System.out.println("Please input exit point: x y");
+    	Cell end = new Cell(in.nextInt(), in.nextInt());
+    	
+    	Stack<Cell> stack = new Stack<Cell>();
+    	
+    	Cell current = start;
+    	while(current != end){
+    		int x = current.x;
+    		int y = current.y;
+    		
+    		System.out.println("Current X Y set:" + x + " " + y);
+    		//Check N
+    		if(Character.getNumericValue((coords[x][y-1])) == 0)
+    			stack.push(new Cell(x, y-1));
+    		//Check S
+    		if(Character.getNumericValue((coords[x][y+1])) == 0)
+    			stack.push(new Cell(x, y+1));
+    		//Check E
+    		if(Character.getNumericValue((coords[x+1][y])) == 0)
+    			stack.push(new Cell(x+1, y));
+    		//Check W
+    		if(Character.getNumericValue((coords[x-1][y])) == 0)
+    			stack.push(new Cell(x-1, y));
+    			
+    		current = stack.pop();
+    	}
+    	
+    	System.out.println("Found exit!");
+    	
+    	
+    	
+    }
+    
+    static class Cell{
+    	int x,y;
+    	Cell(int x, int y){
+    		this.x = x;
+    		this.y = y;
+    	}
+    }
+    
+    
+}
